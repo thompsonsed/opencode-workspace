@@ -115,6 +115,7 @@
 			"exa_*": "allow",
 			"gh_grep_*": "allow",
 			"atlassian_*": "allow",
+			"google_drive_*": "allow",
 			"kagi_*": "deny",
 			"webfetch": "allow",
 			"write": "deny",
@@ -214,7 +215,8 @@
 		"kagi_*": "deny",
 		"webfetch": "deny",
 		"worktree_*": "deny",
-		"atlassian_*": "allow"
+		"atlassian_*": "allow",
+		"google_drive_*": "allow"
 	},
 	"mcp": {
 		"context7": {
@@ -235,6 +237,14 @@
 		"atlassian": {
 			"type": "local",
 			"command": ["npx", "-y", "mcp-remote@latest", "https://mcp.atlassian.com/v1/mcp"],
+			"enabled": true
+		},
+		"google_drive": {
+			"type": "local",
+			"command": ["npx", "-y", "@piotr-agier/google-drive-mcp"],
+			"env": {
+				"GOOGLE_DRIVE_OAUTH_CREDENTIALS": "${GOOGLE_OAUTH_CREDS:-~/.config/google-drive-mcp/gcp-oauth.keys.json}"
+			},
 			"enabled": true
 		}
 	},

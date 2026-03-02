@@ -16,6 +16,7 @@
       ],
       "dependencies": ["workspace"]
     },
+
     {
       "name": "workspace",
       "type": "ocx:bundle",
@@ -36,6 +37,7 @@
         "plan-review",
         "plan-protocol",
         "atlassian",
+        "google-drive",
         "github-cli",
         "python-uv",
         "review-command"
@@ -159,6 +161,14 @@
       "description": "Atlassian MCP tools for Jira and Confluence",
       "files": [
         { "path": "skill/atlassian/SKILL.md", "target": ".opencode/skills/atlassian/SKILL.md" }
+      ]
+    },
+    {
+      "name": "google-drive",
+      "type": "ocx:skill",
+      "description": "Google Drive MCP tools for Drive, Docs, Sheets, Slides, and Calendar operations",
+      "files": [
+        { "path": "skill/google-drive/SKILL.md", "target": ".opencode/skills/google-drive/SKILL.md" }
       ]
     },
     {
