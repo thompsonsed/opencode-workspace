@@ -1,7 +1,6 @@
 {
-  "$schema": "https://ocx.kdco.dev/schemas/registry.json",
+  "$schema": "https://ocx.kdco.dev/schemas/v2/registry.json",
   "name": "Thompson OpenCode Workspace",
-  "namespace": "thompsonsed",
   "version": "1.0.0",
   "author": "Sam Thompson",
   "opencode": "1.0.0",
@@ -9,7 +8,7 @@
   "components": [
     {
       "name": "ws",
-      "type": "ocx:profile",
+      "type": "profile",
       "description": "Workspace profile with Atlassian integration, GitHub Copilot models, and extended skills",
       "files": [
         { "path": "profiles/ws/opencode.jsonc", "target": "opencode.jsonc" },
@@ -19,7 +18,7 @@
     },
     {
       "name": "workspace",
-      "type": "ocx:bundle",
+      "type": "bundle",
       "description": "Complete workspace bundle with agents, plugins, skills, and commands",
       "files": [],
       "dependencies": [
@@ -44,45 +43,45 @@
     },
     {
       "name": "coder",
-      "type": "ocx:agent",
+      "type": "agent",
       "description": "Technical implementation specialist",
       "files": ["agent/coder.md"]
     },
     {
       "name": "researcher",
-      "type": "ocx:agent", 
+      "type": "agent", 
       "description": "Knowledge architect for external research",
       "files": ["agent/researcher.md"]
     },
     {
       "name": "reviewer",
-      "type": "ocx:agent",
+      "type": "agent",
       "description": "Expert code reviewer",
       "files": ["agent/reviewer.md"]
     },
     {
       "name": "scribe",
-      "type": "ocx:agent",
+      "type": "agent",
       "description": "Human-facing content specialist",
       "files": ["agent/scribe.md"]
     },
     {
       "name": "background-agents",
-      "type": "ocx:plugin",
+      "type": "plugin",
       "description": "Async delegation system with persistent storage",
       "files": ["plugin/background-agents.ts"],
       "dependencies": ["kdco-primitives"]
     },
     {
       "name": "workspace-plugin",
-      "type": "ocx:plugin",
+      "type": "plugin",
       "description": "Plan management and rule injection",
       "files": ["plugin/workspace-plugin.ts"],
       "dependencies": ["kdco-primitives"]
     },
     {
       "name": "worktree",
-      "type": "ocx:plugin",
+      "type": "plugin",
       "description": "Git worktree isolation",
       "files": [
         "plugin/worktree.ts",
@@ -93,14 +92,14 @@
     },
     {
       "name": "notify",
-      "type": "ocx:plugin",
+      "type": "plugin",
       "description": "OS-level notifications on task completion",
       "files": ["plugin/notify.ts"],
       "dependencies": ["kdco-primitives"]
     },
     {
       "name": "kdco-primitives",
-      "type": "ocx:plugin",
+      "type": "plugin",
       "description": "Shared utilities for plugins",
       "files": [
         "plugin/kdco-primitives/index.ts",
@@ -116,7 +115,7 @@
     },
     {
       "name": "code-philosophy",
-      "type": "ocx:skill",
+      "type": "skill",
       "description": "The 5 Laws of Elegant Defense",
       "files": [
         { "path": "skill/code-philosophy/SKILL.md", "target": ".opencode/skills/code-philosophy/SKILL.md" }
@@ -124,7 +123,7 @@
     },
     {
       "name": "code-review",
-      "type": "ocx:skill",
+      "type": "skill",
       "description": "Review methodology with severity classification",
       "files": [
         { "path": "skill/code-review/SKILL.md", "target": ".opencode/skills/code-review/SKILL.md" }
@@ -132,7 +131,7 @@
     },
     {
       "name": "frontend-philosophy",
-      "type": "ocx:skill",
+      "type": "skill",
       "description": "The 5 Pillars of Intentional UI",
       "files": [
         { "path": "skill/frontend-philosophy/SKILL.md", "target": ".opencode/skills/frontend-philosophy/SKILL.md" }
@@ -140,7 +139,7 @@
     },
     {
       "name": "plan-review",
-      "type": "ocx:skill",
+      "type": "skill",
       "description": "Implementation plan review criteria",
       "files": [
         { "path": "skill/plan-review/SKILL.md", "target": ".opencode/skills/plan-review/SKILL.md" }
@@ -148,7 +147,7 @@
     },
     {
       "name": "plan-protocol",
-      "type": "ocx:skill",
+      "type": "skill",
       "description": "Implementation planning guidelines with citations",
       "files": [
         { "path": "skill/plan-protocol/SKILL.md", "target": ".opencode/skills/plan-protocol/SKILL.md" }
@@ -156,7 +155,7 @@
     },
     {
       "name": "atlassian",
-      "type": "ocx:skill",
+      "type": "skill",
       "description": "Atlassian MCP tools for Jira and Confluence",
       "files": [
         { "path": "skill/atlassian/SKILL.md", "target": ".opencode/skills/atlassian/SKILL.md" }
@@ -164,7 +163,7 @@
     },
     {
       "name": "github-cli",
-      "type": "ocx:skill",
+      "type": "skill",
       "description": "GitHub CLI (gh) operations",
       "files": [
         { "path": "skill/github-cli/SKILL.md", "target": ".opencode/skills/github-cli/SKILL.md" }
@@ -172,7 +171,7 @@
     },
     {
       "name": "python-uv",
-      "type": "ocx:skill",
+      "type": "skill",
       "description": "Python tooling with uv",
       "files": [
         { "path": "skill/python-uv/SKILL.md", "target": ".opencode/skills/python-uv/SKILL.md" }
@@ -180,7 +179,7 @@
     },
     {
       "name": "review-command",
-      "type": "ocx:command",
+      "type": "command",
       "description": "Code review slash command",
       "files": ["command/review.md"]
     }
