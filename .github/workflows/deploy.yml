@@ -56,6 +56,15 @@ jobs:
       - name: Build registry
         run: bun run build
 
+      - name: Inject version into registry
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if [ -f "dist/index.json" ]; then
+            jq --arg v "$VERSION" '.version = $v' dist/index.json > dist/index.json.tmp && mv dist/index.json.tmp dist/index.json
+            echo "Injected version $VERSION into dist/index.json"
+          fi
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -192,6 +201,12 @@ jobs:
               cd "$WORKTREE"
               bun install --frozen-lockfile 2>/dev/null || bun install
               bun run build 2>/dev/null || bunx ocx build . --out dist
+              
+              # Inject version from tag into the built registry
+              if [ -f "dist/index.json" ]; then
+                jq --arg v "$TAG_VERSION" '.version = $v' dist/index.json > dist/index.json.tmp && mv dist/index.json.tmp dist/index.json
+                echo "Injected version $TAG_VERSION into dist/index.json"
+              fi
               
               # Validate build output before copying (Issue #5)
               if [ -d dist ] && [ "$(ls -A dist)" ]; then
