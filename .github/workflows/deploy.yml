@@ -60,10 +60,53 @@ jobs:
         if: steps.version.outputs.is_release == 'true'
         run: |
           VERSION="${{ steps.version.outputs.version }}"
+          
+          # Verify jq is available
+          command -v jq >/dev/null 2>&1 || { echo "Error: jq not found"; exit 1; }
+          
           if [ -f "dist/index.json" ]; then
-            jq --arg v "$VERSION" '.version = $v' dist/index.json > dist/index.json.tmp && mv dist/index.json.tmp dist/index.json
-            echo "Injected version $VERSION into dist/index.json"
+            jq --arg v "$VERSION" '.version = $v' dist/index.json > dist/index.json.tmp && \
+            mv -f dist/index.json.tmp dist/index.json || \
+            { echo "Error: Failed to inject version"; rm -f dist/index.json.tmp; exit 1; }
+            
+            # Validate injection succeeded
+            if ! jq -e --arg v "$VERSION" '.version == $v' dist/index.json >/dev/null; then
+              echo "Error: Version validation failed"
+              exit 1
+            fi
+            
+            echo "✓ Injected version $VERSION into dist/index.json"
+          else
+            echo "Error: dist/index.json not found after build"
+            exit 1
           fi
+
+      - name: Inject self-referential registry into profiles
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          MAJOR_VERSION=$(echo "$VERSION" | cut -d. -f1)
+          REGISTRY_URL="https://thompsonsed.github.io/opencode-workspace/v${VERSION}"
+          ALIAS="thompsonsed-v${MAJOR_VERSION}"
+          
+          echo "Injecting registry alias '$ALIAS' -> '$REGISTRY_URL'"
+          
+          # Find all profile ocx.jsonc files in dist
+          for ocx_file in dist/files/profiles/*/ocx.jsonc; do
+            if [ -f "$ocx_file" ]; then
+              echo "Processing: $ocx_file"
+              
+              # Use jq to inject registry (works for valid JSON/JSONC without comments)
+              if jq --arg alias "$ALIAS" --arg url "$REGISTRY_URL" \
+                '.registries[$alias] = {"url": $url}' "$ocx_file" > "${ocx_file}.tmp"; then
+                mv -f "${ocx_file}.tmp" "$ocx_file"
+                echo "✓ Injected registry into $ocx_file"
+              else
+                echo "Warning: Failed to inject registry into $ocx_file" >&2
+                rm -f "${ocx_file}.tmp"
+              fi
+            fi
+          done
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -204,9 +247,34 @@ jobs:
               
               # Inject version from tag into the built registry
               if [ -f "dist/index.json" ]; then
-                jq --arg v "$TAG_VERSION" '.version = $v' dist/index.json > dist/index.json.tmp && mv dist/index.json.tmp dist/index.json
-                echo "Injected version $TAG_VERSION into dist/index.json"
+                if jq --arg v "$TAG_VERSION" '.version = $v' dist/index.json > dist/index.json.tmp && \
+                   mv -f dist/index.json.tmp dist/index.json; then
+                  echo "✓ Injected version $TAG_VERSION into dist/index.json"
+                else
+                  echo "Warning: Failed to inject version for $TAG_VERSION" >&2
+                  rm -f dist/index.json.tmp
+                fi
+              else
+                echo "Warning: dist/index.json not found for $TAG_VERSION" >&2
               fi
+              
+              # Inject self-referential registry into profiles
+              TAG_MAJOR_VERSION=$(echo "$TAG_VERSION" | cut -d. -f1)
+              TAG_REGISTRY_URL="https://thompsonsed.github.io/opencode-workspace/v${TAG_VERSION}"
+              TAG_ALIAS="thompsonsed-v${TAG_MAJOR_VERSION}"
+              
+              for ocx_file in dist/files/profiles/*/ocx.jsonc; do
+                if [ -f "$ocx_file" ]; then
+                  if jq --arg alias "$TAG_ALIAS" --arg url "$TAG_REGISTRY_URL" \
+                    '.registries[$alias] = {"url": $url}' "$ocx_file" > "${ocx_file}.tmp"; then
+                    mv -f "${ocx_file}.tmp" "$ocx_file"
+                    echo "✓ Injected registry into $ocx_file for $TAG_VERSION"
+                  else
+                    echo "Warning: Failed to inject registry into $ocx_file" >&2
+                    rm -f "${ocx_file}.tmp"
+                  fi
+                fi
+              done
               
               # Validate build output before copying (Issue #5)
               if [ -d dist ] && [ "$(ls -A dist)" ]; then
