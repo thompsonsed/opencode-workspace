@@ -115,6 +115,7 @@
 			"exa_*": "allow",
 			"gh_grep_*": "allow",
 			"atlassian_*": "allow",
+			"slack_*": "allow",
 			"kagi_*": "deny",
 			"webfetch": "allow",
 			"write": "deny",
@@ -180,6 +181,7 @@
 				"glob": "allow",
 				"read": "allow",
 				"write": "allow",
+				"slack_*": "allow",
 				"plan_read": "deny",
 				"todoread": "deny"
 			}
@@ -214,7 +216,8 @@
 		"kagi_*": "deny",
 		"webfetch": "deny",
 		"worktree_*": "deny",
-		"atlassian_*": "allow"
+		"atlassian_*": "allow",
+		"slack_*": "allow"
 	},
 	"mcp": {
 		"context7": {
@@ -236,6 +239,15 @@
 			"type": "local",
 			"command": ["npx", "-y", "mcp-remote@latest", "https://mcp.atlassian.com/v1/mcp"],
 			"enabled": true
+		},
+		"slack": {
+			"type": "local",
+			"command": ["npx", "-y", "@zencoderai/slack-mcp-server"],
+			"enabled": true,
+			"environment": {
+				"SLACK_BOT_TOKEN": "{env:SLACK_BOT_TOKEN}",
+				"SLACK_TEAM_ID": "{env:SLACK_TEAM_ID}"
+			}
 		}
 	},
 	"plugin": [

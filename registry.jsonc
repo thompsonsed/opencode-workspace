@@ -9,7 +9,7 @@
     {
       "name": "ws",
       "type": "profile",
-      "description": "Workspace profile with Atlassian integration, GitHub Copilot models, and extended skills",
+      "description": "Workspace profile with Atlassian integration, Slack integration, GitHub Copilot models, and extended skills",
       "files": [
         { "path": "profiles/ws/opencode.jsonc", "target": "opencode.jsonc" },
         { "path": "profiles/ws/ocx.jsonc", "target": "ocx.jsonc" }
@@ -38,6 +38,7 @@
         "atlassian",
         "github-cli",
         "python-uv",
+        "slack",
         "review-command"
       ]
     },
@@ -175,6 +176,14 @@
       "description": "Python tooling with uv",
       "files": [
         { "path": "skill/python-uv/SKILL.md", "target": "skills/python-uv/SKILL.md" }
+      ]
+    },
+    {
+      "name": "slack",
+      "type": "skill",
+      "description": "Slack MCP tools for workspace communication",
+      "files": [
+        { "path": "skill/slack/SKILL.md", "target": "skills/slack/SKILL.md" }
       ]
     },
     {
