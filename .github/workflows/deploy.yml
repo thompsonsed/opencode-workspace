@@ -56,6 +56,48 @@ jobs:
       - name: Build registry
         run: bun run build
 
+      - name: Inject version into registry
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Verify jq is available
+          command -v jq >/dev/null 2>&1 || { echo "Error: jq not found"; exit 1; }
+          
+          if [ -f "dist/index.json" ]; then
+            jq --arg v "$VERSION" '.version = $v' dist/index.json > dist/index.json.tmp && \
+            mv -f dist/index.json.tmp dist/index.json || \
+            { echo "Error: Failed to inject version"; rm -f dist/index.json.tmp; exit 1; }
+            
+            # Validate injection succeeded
+            if ! jq -e --arg v "$VERSION" '.version == $v' dist/index.json >/dev/null; then
+              echo "Error: Version validation failed"
+              exit 1
+            fi
+            
+            echo "✓ Injected version $VERSION into dist/index.json"
+          else
+            echo "Error: dist/index.json not found after build"
+            exit 1
+          fi
+
+      - name: Inject self-referential registry into profiles
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          REGISTRY_URL="https://thompsonsed.github.io/opencode-workspace/v${VERSION}"
+          
+          echo "Updating thompsonsed registry URL to '$REGISTRY_URL'"
+          
+          for ocx_file in dist/files/profiles/*/ocx.jsonc; do
+            if [ -f "$ocx_file" ]; then
+              jq --arg url "$REGISTRY_URL" \
+                '.registries.thompsonsed.url = $url' "$ocx_file" > "${ocx_file}.tmp" && \
+              mv "${ocx_file}.tmp" "$ocx_file"
+              echo "✓ Updated thompsonsed registry URL in $ocx_file"
+            fi
+          done
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -192,6 +234,31 @@ jobs:
               cd "$WORKTREE"
               bun install --frozen-lockfile 2>/dev/null || bun install
               bun run build 2>/dev/null || bunx ocx build . --out dist
+              
+              # Inject version from tag into the built registry
+              if [ -f "dist/index.json" ]; then
+                if jq --arg v "$TAG_VERSION" '.version = $v' dist/index.json > dist/index.json.tmp && \
+                   mv -f dist/index.json.tmp dist/index.json; then
+                  echo "✓ Injected version $TAG_VERSION into dist/index.json"
+                else
+                  echo "Warning: Failed to inject version for $TAG_VERSION" >&2
+                  rm -f dist/index.json.tmp
+                fi
+              else
+                echo "Warning: dist/index.json not found for $TAG_VERSION" >&2
+              fi
+              
+              # Inject self-referential registry into profiles
+              REGISTRY_URL="https://thompsonsed.github.io/opencode-workspace/v${TAG_VERSION}"
+              
+              for ocx_file in dist/files/profiles/*/ocx.jsonc; do
+                if [ -f "$ocx_file" ]; then
+                  jq --arg url "$REGISTRY_URL" \
+                    '.registries.thompsonsed.url = $url' "$ocx_file" > "${ocx_file}.tmp" && \
+                  mv "${ocx_file}.tmp" "$ocx_file"
+                  echo "✓ Updated thompsonsed registry URL in $ocx_file"
+                fi
+              done
               
               # Validate build output before copying (Issue #5)
               if [ -d dist ] && [ "$(ls -A dist)" ]; then
