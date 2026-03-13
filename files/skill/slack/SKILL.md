@@ -7,12 +7,14 @@ description: Slack MCP tools for workspace communication
 
 The Slack MCP server provides tools for reading and posting messages, managing reactions, and accessing user information in your Slack workspace. Use these tools for all Slack operations instead of direct API calls.
 
-## Setup Prerequisites
+## Setup
 
-- Create a Slack app at https://api.slack.com/apps
-- Required OAuth scopes: `channels:history`, `channels:read`, `chat:write`, `reactions:write`, `users:read`, `users.profile:read`
-- Set environment variables: `SLACK_BOT_TOKEN` (xoxb-...), `SLACK_TEAM_ID` (T...)
-- Invite the bot to channels it needs to access
+Authentication is handled automatically via browser OAuth when you first use a Slack tool.
+
+1. Use any Slack tool (e.g., "list my Slack channels")
+2. A browser window will open for Slack OAuth
+3. Authorize the app to access your workspace
+4. Authentication persists for future sessions
 
 ## Available Tools
 
@@ -32,7 +34,6 @@ The Slack MCP server provides tools for reading and posting messages, managing r
 - Channel IDs start with `C` (e.g., `C01234567`)
 - Thread timestamps are message identifiers (e.g., `1234567890.123456`)
 - Bot must be invited to channels to read/post messages
-- For private channels, add `groups:history` and `groups:read` scopes
 
 ## Disable/Rollback
 

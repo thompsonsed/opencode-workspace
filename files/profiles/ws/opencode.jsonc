@@ -242,12 +242,8 @@
 		},
 		"slack": {
 			"type": "local",
-			"command": ["npx", "-y", "@zencoderai/slack-mcp-server"],
-			"enabled": true,
-			"environment": {
-				"SLACK_BOT_TOKEN": "{env:SLACK_BOT_TOKEN}",
-				"SLACK_TEAM_ID": "{env:SLACK_TEAM_ID}"
-			}
+			"command": ["npx", "-y", "mcp-remote@latest", "https://mcp.slack.com/mcp"],
+			"enabled": true
 		}
 	},
 	"plugin": [
