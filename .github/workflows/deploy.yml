@@ -85,26 +85,16 @@ jobs:
         if: steps.version.outputs.is_release == 'true'
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          MAJOR_VERSION=$(echo "$VERSION" | cut -d. -f1)
           REGISTRY_URL="https://thompsonsed.github.io/opencode-workspace/v${VERSION}"
-          ALIAS="thompsonsed-v${MAJOR_VERSION}"
           
-          echo "Injecting registry alias '$ALIAS' -> '$REGISTRY_URL'"
+          echo "Updating thompsonsed registry URL to '$REGISTRY_URL'"
           
-          # Find all profile ocx.jsonc files in dist
           for ocx_file in dist/files/profiles/*/ocx.jsonc; do
             if [ -f "$ocx_file" ]; then
-              echo "Processing: $ocx_file"
-              
-              # Use jq to inject registry (works for valid JSON/JSONC without comments)
-              if jq --arg alias "$ALIAS" --arg url "$REGISTRY_URL" \
-                '.registries[$alias] = {"url": $url}' "$ocx_file" > "${ocx_file}.tmp"; then
-                mv -f "${ocx_file}.tmp" "$ocx_file"
-                echo "✓ Injected registry into $ocx_file"
-              else
-                echo "Warning: Failed to inject registry into $ocx_file" >&2
-                rm -f "${ocx_file}.tmp"
-              fi
+              jq --arg url "$REGISTRY_URL" \
+                '.registries.thompsonsed.url = $url' "$ocx_file" > "${ocx_file}.tmp" && \
+              mv "${ocx_file}.tmp" "$ocx_file"
+              echo "✓ Updated thompsonsed registry URL in $ocx_file"
             fi
           done
 
@@ -259,20 +249,14 @@ jobs:
               fi
               
               # Inject self-referential registry into profiles
-              TAG_MAJOR_VERSION=$(echo "$TAG_VERSION" | cut -d. -f1)
-              TAG_REGISTRY_URL="https://thompsonsed.github.io/opencode-workspace/v${TAG_VERSION}"
-              TAG_ALIAS="thompsonsed-v${TAG_MAJOR_VERSION}"
+              REGISTRY_URL="https://thompsonsed.github.io/opencode-workspace/v${TAG_VERSION}"
               
               for ocx_file in dist/files/profiles/*/ocx.jsonc; do
                 if [ -f "$ocx_file" ]; then
-                  if jq --arg alias "$TAG_ALIAS" --arg url "$TAG_REGISTRY_URL" \
-                    '.registries[$alias] = {"url": $url}' "$ocx_file" > "${ocx_file}.tmp"; then
-                    mv -f "${ocx_file}.tmp" "$ocx_file"
-                    echo "✓ Injected registry into $ocx_file for $TAG_VERSION"
-                  else
-                    echo "Warning: Failed to inject registry into $ocx_file" >&2
-                    rm -f "${ocx_file}.tmp"
-                  fi
+                  jq --arg url "$REGISTRY_URL" \
+                    '.registries.thompsonsed.url = $url' "$ocx_file" > "${ocx_file}.tmp" && \
+                  mv "${ocx_file}.tmp" "$ocx_file"
+                  echo "✓ Updated thompsonsed registry URL in $ocx_file"
                 fi
               done
               
