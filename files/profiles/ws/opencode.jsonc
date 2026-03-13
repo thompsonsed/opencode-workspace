@@ -242,7 +242,12 @@
 		},
 		"slack": {
 			"type": "local",
-			"command": ["npx", "-y", "mcp-remote@latest", "https://mcp.slack.com/mcp"],
+			"command": [
+				"npx", "-y", "mcp-remote@latest",
+				"https://mcp.slack.com/mcp",
+				"--static-oauth-client-info", "{\"client_id\":\"1601185624273.8899143856786\"}",
+				"--transport", "http-only"
+			],
 			"enabled": true
 		}
 	},
